@@ -1,3 +1,22 @@
+interface Album {
+    id: number;
+    name: string;
+    image: string;
+    desc: string;
+    bgColor: string;
+  }
+  
+  interface Song {
+    id: number;
+    name: string;
+    image: string;
+    file: string;
+    desc: string;
+    duration: string;
+  }
+  
+
+
 import bell_icon from './bell.png'
 import home_icon from './home.png'
 import like_icon from './like.png'
@@ -67,9 +86,9 @@ export const assets = {
     arrow_right,
     spotify_logo,
     clock_icon
-}
+} as const;
 
-export const albumsData = [
+export const albumsData: Album[] = [
     {   
         id:0,
         name: "Top 50 Global",
@@ -114,7 +133,7 @@ export const albumsData = [
     }
 ]
 
-export const songsData = [
+export const songsData: Song[] = [
     {
         id:0,
         name: "Song One",
