@@ -1,8 +1,16 @@
 import React, { useContext } from "react";
-import { assets, songsData } from "../assets/assets";
+import { assets } from "../assets/assets";
 import { PlayerContext } from "../context/PlayerContext";
 
-const Player = () => {
+const Player: React.FC = () => {
+  const playerContext = useContext(PlayerContext);
+
+  if (!playerContext) {
+    throw new Error(
+      "PlayerContext must be used within a PlayerContextProvider"
+    );
+  }
+
   const {
     track,
     seekBar,
@@ -14,7 +22,7 @@ const Player = () => {
     previous,
     next,
     seekSong,
-  } = useContext(PlayerContext);
+  } = playerContext;
 
   return (
     <div className="h-[10%] bg-black flex justify-between items-center text-white px-4">
