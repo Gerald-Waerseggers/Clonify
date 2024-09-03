@@ -17,7 +17,7 @@ const addSong = async (req, res) => {
       resource_type: "image",
     });
     const duration = `${Math.floor(audioUpload.duration / 60)}:${Math.floor(
-      audioUpload.duration % 60
+      audioUpload.duration % 60,
     )}`;
 
     const songData = {

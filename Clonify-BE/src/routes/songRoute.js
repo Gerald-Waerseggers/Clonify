@@ -14,7 +14,7 @@ songRouter.post(
     { name: "image", maxCount: 1 },
     { name: "audio", maxCount: 1 },
   ]),
-  addSong
+  addSong,
 );
 songRouter.get("/list", listSong);
 songRouter.post("/remove", removeSong);
