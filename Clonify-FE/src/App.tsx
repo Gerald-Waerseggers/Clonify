@@ -9,20 +9,24 @@ const App: React.FC = () => {
 
   if (!playerContext) {
     throw new Error(
-      "PlayerContext must be used within a PlayerContextProvider"
+      "PlayerContext must be used within a PlayerContextProvider",
     );
   }
 
-  const { audioRef, track } = playerContext;
+  const { audioRef, track, songsData } = playerContext;
 
   return (
     <div className="h-screen bg-black">
-      <div className="h-[90%] flex">
-        <Sidebar />
-        <Display />
-      </div>
-      <Player />
-      <audio ref={audioRef} src={track.file} preload="auto" />
+      {songsData.length !== 0 ? (
+        <>
+          <div className="h-[90%] flex">
+            <Sidebar />
+            <Display />
+          </div>
+          <Player />
+        </>
+      ) : null}
+      <audio ref={audioRef} src={track ? track.file : ""} preload="auto" />
     </div>
   );
 };

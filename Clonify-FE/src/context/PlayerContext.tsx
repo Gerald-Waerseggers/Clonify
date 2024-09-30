@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, {
   createContext,
   ReactNode,
@@ -5,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { songsData } from "../assets/assets";
 
 interface PlayerContextProviderProps {
   children: ReactNode;
@@ -24,6 +24,14 @@ interface Track {
   file: string;
 }
 
+interface Album {
+  id: number;
+  name: string;
+  desc: string;
+  image: string;
+  bgColor: string;
+}
+
 interface PlayerContextProps {
   audioRef: React.RefObject<HTMLAudioElement>;
   seekBg: React.RefObject<HTMLDivElement>;
@@ -40,10 +48,14 @@ interface PlayerContextProps {
   previous: () => Promise<void>;
   next: () => Promise<void>;
   seekSong: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => Promise<void>;
+  setSongsData: React.Dispatch<React.SetStateAction<Track[]>>;
+  setAlbumData: React.Dispatch<React.SetStateAction<Album[]>>;
+  albumsData: Album[];
+  songsData: Track[];
 }
 
 export const PlayerContext = createContext<PlayerContextProps | undefined>(
-  undefined
+  undefined,
 );
 
 const PlayerContextProvider: React.FC<PlayerContextProviderProps> = ({
@@ -52,6 +64,11 @@ const PlayerContextProvider: React.FC<PlayerContextProviderProps> = ({
   const audioRef = useRef<HTMLAudioElement>(null);
   const seekBg = useRef<HTMLDivElement>(null);
   const seekBar = useRef<HTMLHRElement>(null);
+
+  const url = "http://localhost:4000";
+
+  const [songsData, setSongsData] = useState<Track[]>([]);
+  const [albumsData, setAlbumData] = useState<Album[]>([]);
 
   const [track, setTrack] = useState<Track>(songsData[1]);
   const [playStatus, setPLayStatus] = useState<boolean>(false);
@@ -75,31 +92,37 @@ const PlayerContextProvider: React.FC<PlayerContextProviderProps> = ({
   };
 
   const playWithId = async (id: number) => {
-    await setTrack(songsData[id]);
-    if (audioRef.current) {
-      await audioRef.current.play();
-      setPLayStatus(true);
-    }
+    await songsData.map((item) => {
+      if (id === item._id) {
+        setTrack(item);
+      }
+    });
+    await audioRef.current?.play();
+    setPLayStatus(true);
   };
 
   const previous = async () => {
-    if (track.id > 0) {
-      await setTrack(songsData[track.id - 1]);
-      if (audioRef.current) {
-        await audioRef.current.play();
-        setPLayStatus(true);
+    songsData.map(async (item, index) => {
+      if (track._id === item._id && index > 0) {
+        await setTrack(songsData[index - 1]);
+        if (audioRef.current) {
+          await audioRef.current.play();
+          setPLayStatus(true);
+        }
       }
-    }
+    });
   };
 
   const next = async () => {
-    if (track.id < songsData.length - 1) {
-      await setTrack(songsData[track.id + 1]);
-      if (audioRef.current) {
-        await audioRef.current.play();
-        setPLayStatus(true);
+    songsData.map(async (item, index) => {
+      if (track._id === item._id && index < songsData.length - 1) {
+        await setTrack(songsData[index + 1]);
+        if (audioRef.current) {
+          await audioRef.current.play();
+          setPLayStatus(true);
+        }
       }
-    }
+    });
   };
 
   const seekSong = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -107,6 +130,21 @@ const PlayerContextProvider: React.FC<PlayerContextProviderProps> = ({
       const percentage = e.nativeEvent.offsetX / seekBg.current.offsetWidth;
       audioRef.current.currentTime = audioRef.current.duration * percentage;
     }
+  };
+
+  const getSongsData = async () => {
+    try {
+      const response = await axios.get(`${url}/api/song/list`);
+      setSongsData(response.data.songs);
+      setTrack(response.data.songs[0]);
+    } catch (error) {}
+  };
+
+  const getAlbumData = async () => {
+    try {
+      const response = await axios.get(`${url}/api/album/list`);
+      setAlbumData(response.data.albums);
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -134,6 +172,11 @@ const PlayerContextProvider: React.FC<PlayerContextProviderProps> = ({
     });
   }, [audioRef]);
 
+  useEffect(() => {
+    getSongsData();
+    getAlbumData();
+  }, []);
+
   const contextValue: PlayerContextProps = {
     audioRef,
     seekBg,
@@ -150,6 +193,10 @@ const PlayerContextProvider: React.FC<PlayerContextProviderProps> = ({
     previous,
     next,
     seekSong,
+    setSongsData,
+    setAlbumData,
+    songsData,
+    albumsData,
   };
 
   return (

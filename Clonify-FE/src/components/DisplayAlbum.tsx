@@ -1,27 +1,41 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { albumsData, assets, songsData } from "../assets/assets"; // Adjust the import path accordingly
+import { assets } from "../assets/assets"; // Adjust the import path accordingly
 import Navbar from "./Navbar";
 import { PlayerContext } from "../context/PlayerContext";
 
-const AlbumComponent: React.FC = () => {
+interface Album {
+  id: number;
+  name: string;
+  image: string;
+  desc: string;
+  tracks: Track[];
+}
+
+interface Track {
+  id: string;
+  name: string;
+  image: string;
+  desc: string;
+  duration: string;
+}
+interface DisplayAlbumProps {
+  album: Album; // Assuming Album is the type you want to use
+}
+
+const DisplayAlbum: React.FC<DisplayAlbumProps> = ({ album }) => {
   const { id } = useParams<{ id: string }>(); // Define the expected type of id
-  const { playWithId } = useContext(PlayerContext);
+  const [albumData, setAlbumData] = useState<Album | undefined>(undefined);
+  const { playWithId, albumsData, songsData } = useContext(PlayerContext);
 
-  // Convert the id from string to number
-  const albumId = Number(id);
+  useEffect(() => {
+    const album = albumsData.find((item: Album) => item._id === id);
+    if (album) {
+      setAlbumData(album);
+    }
+  }, [id, albumsData]);
 
-  // Check if the conversion was successful and if the id is within bounds
-  const albumData =
-    !isNaN(albumId) && albumId >= 0 && albumId < albumsData.length
-      ? albumsData[albumId]
-      : null;
-
-  if (!id || !albumData) {
-    return <div>Album not found</div>;
-  }
-
-  return (
+  return albumData ? (
     <>
       <Navbar />
       <div className="mt-10 flex gap-8 flex-col md:flex-row md:items-end">
@@ -58,24 +72,26 @@ const AlbumComponent: React.FC = () => {
         <img className="m-auto w-4" src={assets.clock_icon} alt="" />
       </div>
       <hr />
-      {songsData.map((item, index) => (
-        <div
-          onClick={() => playWithId(item.id)}
-          key={index}
-          className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-2 items-center text-[#a7a7a7] hover:bg-[#ffffff2b] cursor-pointer"
-        >
-          <p className="text-white">
-            <b className="mr-4 text-[#a7a7a7]">{index + 1}</b>
-            <img className="inline w-10 e-10 mr-5" src={item.image} alt="" />
-            {item.name}
-          </p>
-          <p className="text-[15px]">{albumData.name}</p>
-          <p className="hidden sm:block text-[15px]">5 days ago</p>
-          <p className="text-[15px] text-center">{item.duration}</p>
-        </div>
-      ))}
+      {songsData
+        .filter((item) => item.album === album.name)
+        .map((item, index) => (
+          <div
+            onClick={() => playWithId(item._id)}
+            key={index}
+            className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-2 items-center text-[#a7a7a7] hover:bg-[#ffffff2b] cursor-pointer"
+          >
+            <p className="text-white">
+              <b className="mr-4 text-[#a7a7a7]">{index + 1}</b>
+              <img className="inline w-10 e-10 mr-5" src={item.image} alt="" />
+              {item.name}
+            </p>
+            <p className="text-[15px]">{albumData.name}</p>
+            <p className="hidden sm:block text-[15px]">5 days ago</p>
+            <p className="text-[15px] text-center">{item.duration}</p>
+          </div>
+        ))}
     </>
-  );
+  ) : null;
 };
 
-export default AlbumComponent;
+export default DisplayAlbum;

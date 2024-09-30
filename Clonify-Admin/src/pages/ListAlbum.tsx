@@ -27,7 +27,7 @@ const ListAlbum = () => {
   const fetchAlbums = async () => {
     try {
       const response = await axios.get<FetchAlbumsResponse>(
-        `${url}/api/album/list`
+        `${url}/api/album/list`,
       );
       if (response.data.success) {
         setData(response.data.albums);
@@ -45,7 +45,7 @@ const ListAlbum = () => {
     try {
       const response = await axios.post<RemoveAlbumResponse>(
         `${url}/api/album/remove`,
-        { id }
+        { id },
       );
       if (response.data.success) {
         toast.success(response.data.message);
@@ -56,39 +56,39 @@ const ListAlbum = () => {
     }
   };
 
-  return <div>
-    <p>List of Albums</p>
-    <br />
+  return (
     <div>
-    <div className="sm:grid hidden grid-cols-[0.5fr_1fr_2fr_1fr_0.5fr] items-center gap-2.5 p-3 border border-gray-300 text-sm mr-5 bg-gray-100">
-      <b>Image</b>
-      <b>Name</b>
-      <b>Description</b>
-      <b>Album Colour</b>
-      <b>Action</b>
-    </div>
+      <p>List of Albums</p>
+      <br />
+      <div>
+        <div className="sm:grid hidden grid-cols-[0.5fr_1fr_2fr_1fr_0.5fr] items-center gap-2.5 p-3 border border-gray-300 text-sm mr-5 bg-gray-100">
+          <b>Image</b>
+          <b>Name</b>
+          <b>Description</b>
+          <b>Album Colour</b>
+          <b>Action</b>
+        </div>
 
-    {data.map((item, index) => (
-      <div
-        key={index}
-        className="grid grid-cols-[_1fr_1fr_1fr] sm:grid-cols-[0.5fr_1fr_2fr_1fr_0.5fr] items-center gap-2.5 p-3 border border-gray-300 text-sm mr-5"
-      >
-        <img className="w-12" src={item.image} alt="" />
-        <p>{item.name}</p>
-        <p>{item.desc}</p>
-        <input type="color" value={item.bgColour} />
-        <button
-          className="text-red-500"
-          onClick={() => removeAlbum(item._id)}
-        >
-          Remove
-        </button>
+        {data.map((item, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-[_1fr_1fr_1fr] sm:grid-cols-[0.5fr_1fr_2fr_1fr_0.5fr] items-center gap-2.5 p-3 border border-gray-300 text-sm mr-5"
+          >
+            <img className="w-12" src={item.image} alt="" />
+            <p>{item.name}</p>
+            <p>{item.desc}</p>
+            <input type="color" value={item.bgColour} />
+            <button
+              className="text-red-500"
+              onClick={() => removeAlbum(item._id)}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
       </div>
-    ))}
-
     </div>
-
-  </div>;
+  );
 };
 
 export default ListAlbum;
