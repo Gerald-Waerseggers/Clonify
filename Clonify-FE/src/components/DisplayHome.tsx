@@ -1,11 +1,17 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import Navbar from "./Navbar";
 import AlbumItem from "./AlbumItem";
 import SongItem from "./SongItem";
 import { PlayerContext } from "../context/PlayerContext";
 
 const DisplayHome = () => {
-  const { songsData, albumsData } = useContext(PlayerContext);
+const context = useContext(PlayerContext);
+  if (!context) {
+    // Handle the case where context is not provided
+    throw new Error("PlayerContext must be used within a PlayerContextProvider");
+  }
+
+  const { songsData, albumsData } = context;
 
   return (
     <>

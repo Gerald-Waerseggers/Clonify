@@ -17,6 +17,9 @@ interface Time {
 }
 
 interface Track {
+  duration: ReactNode;
+  _id: number;
+  album: string;
   id: number;
   name: string;
   desc: string;
@@ -25,11 +28,13 @@ interface Track {
 }
 
 interface Album {
-  id: number;
+  _id: string;
   name: string;
   desc: string;
   image: string;
-  bgColor: string;
+  bgColour: string;
+  tracks: Track[];
+
 }
 
 interface PlayerContextProps {
@@ -54,9 +59,10 @@ interface PlayerContextProps {
   songsData: Track[];
 }
 
-export const PlayerContext = createContext<PlayerContextProps | undefined>(
-  undefined,
+export const PlayerContext = createContext<PlayerContextProps>(
+  {} as PlayerContextProps
 );
+
 
 const PlayerContextProvider: React.FC<PlayerContextProviderProps> = ({
   children,

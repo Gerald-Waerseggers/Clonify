@@ -6,12 +6,12 @@ import { PlayerContext } from "../context/PlayerContext";
 
 // Define necessary interfaces/types
 interface Album {
-  id: number;
+  _id: number;
   name: string;
   image: string;
   desc: string;
   tracks: Track[];
-  bgColor: string;
+  bgColour: string;
 }
 
 interface Track {
@@ -23,15 +23,20 @@ interface Track {
 }
 
 const Display = () => {
-  const { albumsData } = useContext(PlayerContext);
+  const context = useContext(PlayerContext);
+  if (!context) {
+    // Handle the case where context is not provided
+    throw new Error("PlayerContext must be used within a PlayerContextProvider");
+  }
 
+  const { albumsData } = context;
   const displayRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const isAlbum = location.pathname.includes("album");
   const albumId = isAlbum ? location.pathname.split("/").pop() : null;
 
   // Find the album using `_id` from the URL
-  const album = albumsData.find((x: Album) => x._id === albumId);
+  const album = albumsData.find((x: Album) => x._id as unknown as string === albumId);
 
   // Get bgColour or default to "#121212"
   const bgColor = album ? album.bgColour : "#121212";
@@ -49,7 +54,6 @@ const Display = () => {
       ref={displayRef}
       className=" w-full m-2 px-6 pt-4 rounded bg-[#121212] text-white overflow-auto lg:w-[75%] lg:ml-0"
     >
-      {isAlbum && album ? <DisplayAlbum album={album} /> : <DisplayHome />}
       <Routes>
         <Route path="/" element={<DisplayHome />} />
         <Route path="/album/:id" element={<DisplayAlbum album={album} />} />

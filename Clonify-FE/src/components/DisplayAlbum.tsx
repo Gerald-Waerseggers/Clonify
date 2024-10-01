@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import { PlayerContext } from "../context/PlayerContext";
 
 interface Album {
-  id: number;
+  _id: string;
   name: string;
   image: string;
   desc: string;
@@ -13,11 +13,12 @@ interface Album {
 }
 
 interface Track {
-  id: string;
+  _id: string;
   name: string;
   image: string;
   desc: string;
   duration: string;
+  album: string;
 }
 interface DisplayAlbumProps {
   album: Album; // Assuming Album is the type you want to use
@@ -25,7 +26,7 @@ interface DisplayAlbumProps {
 
 const DisplayAlbum: React.FC<DisplayAlbumProps> = ({ album }) => {
   const { id } = useParams<{ id: string }>(); // Define the expected type of id
-  const [albumData, setAlbumData] = useState<Album | undefined>(undefined);
+  const [albumData, setAlbumData] = useState<Album>(album);
   const { playWithId, albumsData, songsData } = useContext(PlayerContext);
 
   useEffect(() => {
